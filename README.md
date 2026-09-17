@@ -1,4 +1,4 @@
-# The phenomenon
+# Aurora Borealis
 
 <!-- This is the SD5913 assignment 2 template. Everything in this file is yours to
 replace, and the check counts words: comments like this one are not words, so
