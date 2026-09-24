@@ -1,34 +1,32 @@
 # Aurora Borealis
 
-<!-- This is the SD5913 assignment 2 template. Everything in this file is yours to
-replace, and the check counts words: comments like this one are not words, so
-delete each one as you write. Start with the heading: name the phenomenon.
-
-Then, in this order, at least 150 words in total.
-
-New to folders, paths, or the files here whose names start with a dot? Read
-https://github.com/sd5913/pfad/blob/2026/reference/files.md first. Ten minutes. -->
-
-![what the picture is](out/plot.png)
-
 ## The phenomenon
 
-<!-- What goes up and down, and why you looked at it. -->
+The aurora is driven by disturbances in Earth's magnetic field, and those disturbances are measured all the time, whether or not anyone is looking at the sky. The standard measure is the **Kp index**, a number from 0 to 9 reported for every 3-hour window. Around 0 to 2 is calm, 5 or more counts as a geomagnetic storm, and 9 is the most extreme. I looked at a full year of it because I wanted to see how rarely the sky really gets going, and when.
 
 ## The source
 
-<!-- A link to the page or endpoint the file came from, and one line on what is in
-the file: how many rows, what a row means, what the units are. -->
+The numbers come from **GFZ Helmholtz Centre for Geosciences, Potsdam**, which produces the official Kp index. The data is licensed CC BY 4.0, and I credit GFZ Potsdam as the source.
 
-## What the picture shows
+- Data page: https://kp.gfz.de/en/data
+- Exact address I fetched (once): https://kp.gfz.de/app/json/?start=2025-09-24T00:00:00Z&end=2026-09-23T23:59:59Z&index=Kp
 
-<!-- Two or three sentences. Including what it hides: every transformation throws
-something away, and naming what yours threw away is the easiest way to sound like
-you know what you did. -->
+The file is `data/kp-1year.json`, saved exactly as it arrived. It holds **2,920 values**, one per 3-hour slot, from 24 September 2025 00:00 to 23 September 2026 21:00 (UTC). Each value is a unitless Kp number between 0 and 9, given in thirds (for example 1.667). A `status` list marks each value as `def` (definitive) or `pre` (preliminary). The last 184 values, from 1 September 2026, are preliminary and may still be revised.
 
-## Run it
+## The picture
+
+![Kp index over one year, as a plain line](out/first-plot.png)
+
+*(This is my first, plain version. It will be replaced by the aurora version.)*
+
+## What it shows, and what it hides
+
+Most of the year is calm: 2,559 of the 2,920 slots are below Kp 4. Only 133 slots reach storm level (Kp 5 or more), and they arrive in short bursts. The strongest reached Kp 8.667, on 12 November 2025 and on 19 January 2026.
+
+It hides a lot. Kp is an average across magnetometers at mid-latitudes, so it says nothing about what anyone can see from one particular place. It is also a 3-hour figure, so short bursts inside a window are smoothed away. And it measures magnetic disturbance, not the aurora itself: cloud, daylight and location decide whether anyone actually sees anything. Kp contains no colour information either, so any colours I add later are my own choice and not something that was measured.
+
+## How to run it
 
 ```
-uv run fetch.py
 uv run plot.py
 ```
