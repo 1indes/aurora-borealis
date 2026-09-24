@@ -13,9 +13,8 @@ from scipy.interpolate import PchipInterpolator
 
 HEIGHT = 0.26      # how tall one Kp unit is. Lower it if the curtains feel crowded.
 FADE = 1.1         # how far the glow falls below each curve (bigger = fuller curtain)
+END_FADE = 1.2     # how many days each ribbon takes to fade in and out
 BACKGROUND = "#050814"
-MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 # Kp value -> colour. Between these points the colour blends smoothly.
 # These colours are my choice. The data itself has no colour in it.
@@ -40,11 +39,6 @@ def kp_to_colour(kp):
             return tuple(low_col[j] + (high_col[j] - low_col[j]) * t
                          for j in range(3))
     return STOPS[-1][1]
-
-
-def month_label(key):
-    # "2025-09" -> "Sep 2025"
-    return MONTH_NAMES[int(key[5:7]) - 1] + " " + key[:4]
 
 
 def smooth_curve(xs, kps):
@@ -79,9 +73,11 @@ for i in range(len(kps)):
     kps_by_month[key].append(kps[i])
 
 max_height = max(kps) * HEIGHT
-fig, ax = plt.subplots(figsize=(10, 8))
+fig = plt.figure(figsize=(10, 9))
 fig.patch.set_facecolor(BACKGROUND)
+ax = fig.add_axes([0.04, 0.03, 0.92, 0.94])
 ax.set_facecolor(BACKGROUND)
+ax.axis("off")
 
 # oldest month at the top; each later month is drawn in front of the one above
 for m in range(len(months)):
@@ -94,67 +90,44 @@ for m in range(len(months)):
     for value in kp:
         colours.append(kp_to_colour(value))
 
-    # 1. hide whatever is behind this curtain
-    ax.fill_between(x, base - 1.5, top, color=BACKGROUND, linewidth=0,
-                    zorder=3 * m)
+    # each ribbon fades in and out at its two ends instead of stopping dead
+    ends = np.clip((x - x[0]) / END_FADE, 0, 1) * np.clip((x[-1] - x) / END_FADE, 0, 1)
 
-    # 2. the soft curtain of light, brightest at the curve and fading downward
-    rows = 120
-    heights = np.linspace(0, max_height, rows)
+    # 1. the soft curtain of light, brightest at the curve and fading downward
+    #    (it carries on below the baseline, so nothing ends in a flat edge)
+    rows = 160
+    heights = np.linspace(-FADE, max_height, rows)
     glow = np.zeros((rows, len(x), 4))
     for i in range(len(x)):
         depth = kp[i] * HEIGHT - heights
-        alpha = np.clip(1 - depth / FADE, 0, 1) * (depth >= 0) * 0.6
+        # taller peaks get a longer glow, so storms hang all the way down
+        glow_length = kp[i] * HEIGHT + FADE
+        alpha = np.clip(1 - depth / glow_length, 0, 1) ** 1.5
+        alpha = alpha * (depth >= 0) * 0.55 * ends[i]
         glow[:, i, 0] = colours[i][0]
         glow[:, i, 1] = colours[i][1]
         glow[:, i, 2] = colours[i][2]
         glow[:, i, 3] = alpha
-    ax.imshow(glow, extent=[x[0], x[-1], base, base + max_height],
+    ax.imshow(glow, extent=[x[0], x[-1], base - FADE, base + max_height],
               origin="lower", aspect="auto", interpolation="bilinear",
               zorder=3 * m + 1)
 
-    # 3. the glowing edge: three passes, wide and faint to thin and bright
+    # 2. the glowing edge: three passes, wide and faint to thin and bright
     points = np.array([x, top]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
-    for width, alpha in [(7, 0.06), (3.5, 0.15), (1.2, 0.95)]:
-        edge = LineCollection(segments, colors=colours[:-1], linewidths=width,
-                              alpha=alpha, capstyle="round",
-                              zorder=3 * m + 2)
+    for width, strength in [(7, 0.06), (3.5, 0.15), (1.2, 0.95)]:
+        edge_colours = []
+        for i in range(len(x) - 1):
+            r, g, b = colours[i]
+            edge_colours.append((r, g, b, strength * ends[i]))
+        edge = LineCollection(segments, colors=edge_colours, linewidths=width,
+                              capstyle="round", zorder=3 * m + 2)
         ax.add_collection(edge)
 
-ticks = []
-labels = []
-for m in range(len(months)):
-    ticks.append(-m)
-    labels.append(month_label(months[m]))
-ax.set_yticks(ticks)
-ax.set_yticklabels(labels)
-
-ax.set_xlim(0, 31)
-ax.set_ylim(-(len(months) - 1) - 0.4, max_height + 0.3)
-ax.set_xlabel("Day of month (UTC)")
-ax.set_title("A year of geomagnetic activity, one curtain per month",
-             color="#e8ecf5", pad=14)
-ax.tick_params(colors="#c8d0e0", length=0)
-ax.xaxis.label.set_color("#c8d0e0")
-for side in ax.spines:
-    ax.spines[side].set_visible(False)
-
-# a small key: which colour means which Kp
-key_ax = fig.add_axes([0.62, 0.05, 0.28, 0.016])
-strip = np.zeros((1, 200, 3))
-for i in range(200):
-    strip[0, i] = kp_to_colour(9 * i / 199)
-key_ax.imshow(strip, aspect="auto", extent=[0, 9, 0, 1])
-key_ax.set_yticks([])
-key_ax.set_xticks([0, 3, 5, 7, 9])
-key_ax.tick_params(colors="#c8d0e0", labelsize=8, length=2)
-key_ax.set_xlabel("Kp index (colours chosen by me, not measured)",
-                  color="#c8d0e0", fontsize=8)
-for side in key_ax.spines:
-    key_ax.spines[side].set_visible(False)
-
-fig.subplots_adjust(bottom=0.17)
+# just the light: no axes, no labels, no title
+top_limit = max(kps_by_month[months[0]]) * HEIGHT + 0.4
+ax.set_xlim(-1, 32)
+ax.set_ylim(-(len(months) - 1) - FADE - 0.2, top_limit)
 
 os.makedirs("out", exist_ok=True)
 plt.savefig("out/aurora.png", dpi=150, facecolor=BACKGROUND)
