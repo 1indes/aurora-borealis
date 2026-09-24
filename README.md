@@ -1,4 +1,4 @@
-# aurora-borealis
+# Aurora Borealis
 
 A year of geomagnetic activity, drawn as a ring of light.
 
