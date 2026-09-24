@@ -2,14 +2,14 @@
 # requires-python = ">=3.10"
 # dependencies = ["requests"]
 # ///
-import requests, pathlib, json
+import requests
 
-# NOAA planetary Kp index feed (3-hour values)
-url = "https://services.swpc.noaa.gov/json/planetary_k_index_1m.json"
-response = requests.get(url)
-data = response.json()
+URL = "https://kp.gfz.de/app/json/?start=2025-09-24T00:00:00Z&end=2026-09-23T23:59:59Z&index=Kp"
 
-pathlib.Path("data").mkdir(exist_ok=True)
+reply = requests.get(URL)
+reply.raise_for_status()
 
-with open("data/aurora-kp.json", "w") as f:
-    json.dump(data, f)
+with open("data/kp-1year.json", "wb") as f:
+    f.write(reply.content)
+
+print("Saved", len(reply.content), "bytes")
