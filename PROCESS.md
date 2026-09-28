@@ -20,5 +20,5 @@ The first "curtains" picture used stacked bars, one row per month. It was blocky
 - It suggested the NOAA 3-hour file might cover 30 days. It had 56 readings, one week, so I switched to GFZ Potsdam to get a full year.
 - It said the first big spike on my line chart would be near reading 150. The picture showed it near 390.
 - It wrote the first README description before seeing my picture, and called the year "a steady green glow". The finished ring is a dense mix of green, teal and blue, so I rewrote it.
-- It described all the storms as "pink and purple". When I measured the full-size picture against my data, only the two Kp 8.7 storms are pink, and the Kp 7 storms are thinner and lilac, so the README now says that.
+- It described all the storms as "pink and purple". When I gave it the full-size picture, it measured the angle of each streak against my data (I didn't measure it myself). Only the two Kp 8.7 storms are pink, and the Kp 7 storms are thinner and lilac, so the README now says that.
 - I checked the row counts at each step (357, 56 and 2,920 readings), and nothing was silently dropped.
