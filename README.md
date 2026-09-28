@@ -4,7 +4,7 @@ A year of geomagnetic activity, drawn as a ring of light.
 
 ## The phenomenon
 
-The aurora happens when charged particles from the sun disturb Earth's magnetic field. That disturbance is measured all the time, whether or not anyone is looking at the sky. The standard measure is the **Kp index**, a number from 0 to 9 reported for every 3-hour window. Low values mean a calm field, 5 or more counts as a geomagnetic storm (level G1 on NOAA's scale), and 9 is the most extreme. I looked at a full year because I wanted to see how rarely the sky really gets going, and when. I chose the aurora because it has always fascinated me as something I know is scientifically explained but that cannot help but feel magical. I think it fits well with this assigment -- representing something of the STEM world as an artwork that feels magical instead of just a collection of dates on axes.
+The aurora happens when charged particles from the sun disturb Earth's magnetic field. That disturbance is measured all the time, whether or not anyone is looking at the sky. The standard measure is the **Kp index**, a number from 0 to 9 reported for every 3-hour window. Low values mean a calm field, 5 or more counts as a geomagnetic storm (level G1 on NOAA's scale), and 9 is the most extreme. I looked at a full year because I wanted to see how rarely the sky really gets going, and when. I chose the aurora because it has always fascinated me as something I know is scientifically explained but that cannot help but feel magical. I think it fits well with this assignment -- representing something of the STEM world as an artwork that feels magical instead of just a collection of dates on axes.
 
 ## The source
 
